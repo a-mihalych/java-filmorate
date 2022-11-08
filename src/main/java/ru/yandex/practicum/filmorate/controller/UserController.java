@@ -2,11 +2,10 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.service.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,18 +48,12 @@ public class UserController {
 
     User validationUser(String method, User user) throws ValidationException {
         String error = "";
-        if (user.getLogin().contains(" ")) {
-            error += (method + "пользователя прервано! Логин не может содержать пробелы.\n");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            error += (method + "пользователя прервано! Дата рождения не может быть в будущем.\n");
-        }
         for (User userCollection : getUsers()) {
             if ((userCollection.getId() != user.getId()) && (userCollection.getLogin().equals(user.getLogin()))) {
                 if (method.equals("Создание ")) {
-                    error += (method + "пользователя прервано! Логин занят.\n");
+                    error += (method + "пользователя прервано! Логин занят.");
                 } else {
-                    error += (method + "пользователя прервано! Неверный id.\n");
+                    error += (method + "пользователя прервано! Неверный id.");
                 }
                 break;
             }

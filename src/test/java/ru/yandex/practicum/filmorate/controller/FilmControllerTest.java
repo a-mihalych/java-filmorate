@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.service.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -17,21 +17,6 @@ public class FilmControllerTest {
     @BeforeEach
     public void initFilmController() {
         filmController = new FilmController();
-    }
-
-    @Test
-    public void releaseDate() {
-        Film film = Film.builder()
-                    .id(1)
-                    .name("Кино")
-                    .description("Интересное кино, наверное.")
-                    .releaseDate(LocalDate.of(1888, 8, 8))
-                    .duration(99)
-                    .build();
-        ValidationException exception = assertThrows(ValidationException.class,
-                                        () -> filmController.validationFilm("Создание ", film));
-        assertEquals("Создание фильма прервано! Дата релиза раньше появления первого фильма.\n",
-                     exception.getMessage(), "Ошибка не обнаружена.");
     }
 
     @Test
@@ -57,7 +42,7 @@ public class FilmControllerTest {
         }
         ValidationException exception = assertThrows(ValidationException.class,
                                         () -> filmController.validationFilm("Создание ", film2));
-        assertEquals("Создание фильма прервано! Название уже существует.\n",
+        assertEquals("Создание фильма прервано! Название уже существует.",
                      exception.getMessage(), "Ошибка не обнаружена.");
     }
 
@@ -84,7 +69,7 @@ public class FilmControllerTest {
         }
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> filmController.validationFilm("Обновление ", film2));
-        assertEquals("Обновление фильма прервано! Неверный id.\n",
+        assertEquals("Обновление фильма прервано! Неверный id.",
                      exception.getMessage(), "Ошибка не обнаружена.");
     }
 }

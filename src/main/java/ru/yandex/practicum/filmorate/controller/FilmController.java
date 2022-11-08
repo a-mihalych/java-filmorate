@@ -2,11 +2,10 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.service.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,6 @@ import java.util.Map;
 @Slf4j
 public class FilmController {
 
-    public final static LocalDate BEGIN_OF_CINEMA_ERA = LocalDate.of(1895, 12, 28);
     private Map<Integer, Film> films = new HashMap<>();
     private int id = 1;
 
@@ -50,15 +48,12 @@ public class FilmController {
 
     void validationFilm(String method, Film film) throws ValidationException {
         String error = "";
-        if (film.getReleaseDate().isBefore(BEGIN_OF_CINEMA_ERA)) {
-            error += (method + "фильма прервано! Дата релиза раньше появления первого фильма.\n");
-        }
         for (Film filmCollection : getFilms()) {
             if ((filmCollection.getId() != film.getId()) && (filmCollection.getName().equals(film.getName()))) {
                 if (method.equals("Создание ")) {
-                    error += (method + "фильма прервано! Название уже существует.\n");
+                    error += (method + "фильма прервано! Название уже существует.");
                 } else {
-                    error += (method + "фильма прервано! Неверный id.\n");
+                    error += (method + "фильма прервано! Неверный id.");
                 }
                 break;
             }

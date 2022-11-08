@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.service.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -16,36 +16,6 @@ public class UserControllerTest {
     @BeforeEach
     public void initUserController() {
         userController = new UserController();
-    }
-
-    @Test
-    public void loginWithSpace() {
-        User user = User.builder()
-                    .id(1)
-                    .email("email@yandex.ru")
-                    .login("Log in")
-                    .name("Name user")
-                    .birthday(LocalDate.of(2000, 2, 22))
-                    .build();
-        ValidationException exception = assertThrows(ValidationException.class,
-                                        () -> userController.validationUser("Создание ", user));
-        assertEquals("Создание пользователя прервано! Логин не может содержать пробелы.\n",
-                     exception.getMessage(), "Ошибка не обнаружена.");
-    }
-
-    @Test
-    public void birthdayInFuture() {
-        User user = User.builder()
-                .id(1)
-                .email("email@yandex.ru")
-                .login("Login")
-                .name("Name user")
-                .birthday(LocalDate.of(2222, 2, 22))
-                .build();
-        ValidationException exception = assertThrows(ValidationException.class,
-                                        () -> userController.validationUser("Создание ", user));
-        assertEquals("Создание пользователя прервано! Дата рождения не может быть в будущем.\n",
-                     exception.getMessage(), "Ошибка не обнаружена.");
     }
 
     @Test
@@ -71,7 +41,7 @@ public class UserControllerTest {
         }
         ValidationException exception = assertThrows(ValidationException.class,
                                         () -> userController.validationUser("Создание ", user2));
-        assertEquals("Создание пользователя прервано! Логин занят.\n",
+        assertEquals("Создание пользователя прервано! Логин занят.",
                      exception.getMessage(), "Ошибка не обнаружена.");
     }
 
@@ -98,7 +68,7 @@ public class UserControllerTest {
         }
         ValidationException exception = assertThrows(ValidationException.class,
                                         () -> userController.validationUser("Обновление ", user2));
-        assertEquals("Обновление пользователя прервано! Неверный id.\n",
+        assertEquals("Обновление пользователя прервано! Неверный id.",
                      exception.getMessage(), "Ошибка не обнаружена.");
     }
 
