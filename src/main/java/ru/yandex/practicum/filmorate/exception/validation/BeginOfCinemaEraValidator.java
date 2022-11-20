@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.validation;
+package ru.yandex.practicum.filmorate.exception.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -10,6 +10,9 @@ public class BeginOfCinemaEraValidator implements ConstraintValidator<BeginOfCin
 
     @Override
     public boolean isValid(LocalDate date, ConstraintValidatorContext context) {
-        return !date.isBefore(BEGIN_OF_CINEMA_ERA);
+        if (date != null) {
+            return !date.isBefore(BEGIN_OF_CINEMA_ERA);
+        }
+        return true;
     }
 }

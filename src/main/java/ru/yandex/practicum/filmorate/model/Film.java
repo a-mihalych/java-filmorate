@@ -1,20 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import ru.yandex.practicum.filmorate.service.validation.BeginOfCinemaEra;
+import lombok.*;
+import ru.yandex.practicum.filmorate.exception.validation.BeginOfCinemaEra;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
-@Data
+@Setter
+@Getter
 @Builder(toBuilder = true)
+@ToString
+@EqualsAndHashCode(of = "id")
 @AllArgsConstructor
+@NoArgsConstructor
 public class Film {
 
     @PositiveOrZero
-    private int id;
+    private Integer id;
     @NotBlank
     private String name;
     @NotBlank
@@ -24,6 +26,7 @@ public class Film {
     @PastOrPresent
     @BeginOfCinemaEra
     private LocalDate releaseDate;
+    @NotNull
     @Positive
-    private int duration;
+    private Integer duration;
 }

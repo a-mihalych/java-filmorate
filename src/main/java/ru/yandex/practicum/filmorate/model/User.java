@@ -1,19 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
-@Data
+@Setter
+@Getter
 @Builder(toBuilder = true)
+@ToString
+@EqualsAndHashCode(of = "id")
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @PositiveOrZero
-    private int id;
+    private Integer id;
     @NotBlank
     @Email
     private String email;
