@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -16,24 +14,17 @@ import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 @Slf4j
 @Getter
-@Setter
 @Service
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class ValidationService {
 
-    UserStorage userStorage;
-    FilmStorage filmStorage;
+    private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
 
-    @Autowired
-    public ValidationService(UserStorage userStorage, FilmStorage filmStorage) {
-        this.userStorage = userStorage;
-        this.filmStorage = filmStorage;
-    }
-
-    public User validationUser(String method, User user) throws ValidationException, FilmorateException {
+    public User validationUser(String method, User user) {
         String error = "";
         for (User userCollection : userStorage.getUsers()) {
-            if ((userCollection.getId() != user.getId()) && (userCollection.getLogin().equals(user.getLogin()))) {
+            if (!userCollection.getId().equals(user.getId()) && userCollection.getLogin().equals(user.getLogin())) {
                 if (method.equals("Создание ")) {
                     error += (method + "пользователя прервано! Логин занят.");
                 } else {
@@ -55,10 +46,10 @@ public class ValidationService {
         return user;
     }
 
-    public Film validationFilm(String method, Film film) throws ValidationException, FilmorateException {
+    public Film validationFilm(String method, Film film) {
         String error = "";
         for (Film filmCollection : filmStorage.getFilms()) {
-            if ((filmCollection.getId() != film.getId()) && (filmCollection.getName().equals(film.getName()))) {
+            if (!filmCollection.getId().equals(film.getId()) && filmCollection.getName().equals(film.getName())) {
                 if (method.equals("Создание ")) {
                     error += (method + "фильма прервано! Название уже существует.");
                 } else {
@@ -76,7 +67,7 @@ public class ValidationService {
         return film;
     }
 
-    public int validationPositive(int id, String name) throws NotFoundException {
+    public int validationPositive(int id, String name) {
         if (id < 1) {
             String error = "Ошибка, аргумент " + name + " должен быть больше 0.";
             log.warn("!!! ValidationService: {}", error);

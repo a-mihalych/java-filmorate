@@ -1,38 +1,28 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.exception.FilmorateException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.*;
 
 @Slf4j
 @Service
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
-    UserStorage userStorage;
-    ValidationService validationService;
+    private final UserStorage userStorage;
+    private final ValidationService validationService;
 
-    @Autowired
-    public UserService(InMemoryUserStorage userStorage, ValidationService validationService) {
-        this.userStorage = userStorage;
-        this.validationService = validationService;
-    }
-
-    public User createUser(User user) throws ValidationException, FilmorateException {
+    public User createUser(User user) {
         user = validationService.validationUser("Создание ", user);
         return userStorage.createUser(user);
     }
 
-    public User updateUser(User user) throws ValidationException, FilmorateException {
+    public User updateUser(User user) {
         user = validationService.validationUser("Обновление ", user);
         return userStorage.saveUser(user);
     }
@@ -41,7 +31,7 @@ public class UserService {
         return userStorage.getUsers();
     }
 
-    public User getUser(int id) throws NotFoundException {
+    public User getUser(int id) {
         id = validationService.validationPositive(id, "id");
         User user = userStorage.getUser(id);
         if (user == null) {
@@ -51,7 +41,7 @@ public class UserService {
         return user;
     }
 
-    public Collection<User> getFriendsForIdUser(int id) throws NotFoundException {
+    public Collection<User> getFriendsForIdUser(int id) {
         id = validationService.validationPositive(id, "id");
         Collection<Integer> idFriends = userStorage.getIdFriendsForIdUser(id);
         if (idFriends == null) {
@@ -65,7 +55,7 @@ public class UserService {
         return friends;
     }
 
-    public Collection<User> mutualFriends(int id, int otherId) throws NotFoundException {
+    public Collection<User> mutualFriends(int id, int otherId) {
         id = validationService.validationPositive(id, "id");
         otherId = validationService.validationPositive(otherId, "otherId");
         Set<User> friendsMutual = new HashSet<>(getFriendsForIdUser(id));
@@ -75,7 +65,7 @@ public class UserService {
         return friendsMutual;
     }
 
-    public void addFriend(int id, int friendId) throws NotFoundException {
+    public void addFriend(int id, int friendId) {
         id = validationService.validationPositive(id, "id");
         friendId = validationService.validationPositive(friendId, "friendId");
         if ((userStorage.getUser(id) == null) || (userStorage.getUser(friendId) == null)) {
@@ -85,7 +75,7 @@ public class UserService {
         userStorage.addFriend(id, friendId);
     }
 
-    public void deleteFriend(int id, int friendId) throws NotFoundException {
+    public void deleteFriend(int id, int friendId) {
         id = validationService.validationPositive(id, "id");
         friendId = validationService.validationPositive(friendId, "friendId");
         if ((userStorage.getUser(id) == null) || (userStorage.getUser(friendId) == null)) {

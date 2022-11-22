@@ -1,14 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.exception.FilmorateException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
 import java.util.*;
@@ -16,24 +12,18 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class FilmService {
 
-    FilmStorage filmStorage;
-    ValidationService validationService;
+    private final FilmStorage filmStorage;
+    private final ValidationService validationService;
 
-    @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage, ValidationService validationService) {
-        this.filmStorage = filmStorage;
-        this.validationService = validationService;
-    }
-
-    public Film createFilm(Film film) throws ValidationException, FilmorateException {
+    public Film createFilm(Film film) {
         film = validationService.validationFilm("Создание ", film);
         return filmStorage.createFilm(film);
     }
 
-    public Film updateFilm(Film film) throws ValidationException, FilmorateException {
+    public Film updateFilm(Film film) {
         film = validationService.validationFilm("Обновление ", film);
         return filmStorage.saveFilm(film);
     }
@@ -42,7 +32,7 @@ public class FilmService {
         return filmStorage.getFilms();
     }
 
-    public Film getFilm(int id) throws NotFoundException {
+    public Film getFilm(int id) {
         id = validationService.validationPositive(id, "id");
         Film film = filmStorage.getFilm(id);
         if (film == null) {
@@ -52,7 +42,7 @@ public class FilmService {
         return film;
     }
 
-    public Collection<Film> getFilmsLikes(int count) throws NotFoundException {
+    public Collection<Film> getFilmsLikes(int count) {
         count = validationService.validationPositive(count, "count");
         Map<Integer, Set<Integer>> likesSort = filmStorage.getFilmsLikes().entrySet().stream()
                 .sorted(Comparator.comparingInt(e -> -e.getValue().size()))
@@ -73,13 +63,13 @@ public class FilmService {
         return rating;
     }
 
-    public void addLike(int id, int userId) throws NotFoundException {
+    public void addLike(int id, int userId) {
         id = validationService.validationPositive(id, "id");
         userId = validationService.validationPositive(userId, "userId");
         filmStorage.addLike(id, userId);
     }
 
-    public void deleteLike(int id, int userId) throws NotFoundException {
+    public void deleteLike(int id, int userId) {
         id = validationService.validationPositive(id, "id");
         userId = validationService.validationPositive(userId, "userId");
         filmStorage.addLike(id, userId);

@@ -22,12 +22,11 @@ public class ValidationServiceTest {
 
     @BeforeEach
     public void initValidationService() {
-        validationService = new ValidationService();
+        validationService = new ValidationService(new InMemoryUserStorage(), new InMemoryFilmStorage());
     }
 
     @Test
     public void filmAlreadyExists() {
-        validationService.setFilmStorage(new InMemoryFilmStorage());
         Film film1 = Film.builder()
                 .id(1)
                 .name("Кино")
@@ -51,7 +50,6 @@ public class ValidationServiceTest {
 
     @Test
     public void InvalidIdFilm() {
-        validationService.setFilmStorage(new InMemoryFilmStorage());
         Film film1 = Film.builder()
                 .id(1)
                 .name("Кино")
@@ -75,7 +73,6 @@ public class ValidationServiceTest {
 
     @Test
     public void loginBusy() {
-        validationService.setUserStorage(new InMemoryUserStorage());
         User user1 = User.builder()
                 .id(1)
                 .email("email@yandex.ru")
@@ -99,7 +96,6 @@ public class ValidationServiceTest {
 
     @Test
     public void InvalidIdUser() {
-        validationService.setUserStorage(new InMemoryUserStorage());
         User user1 = User.builder()
                 .id(1)
                 .email("email@yandex.ru")
@@ -123,7 +119,6 @@ public class ValidationServiceTest {
 
     @Test
     public void emptyName() throws ValidationException, FilmorateException {
-        validationService.setUserStorage(new InMemoryUserStorage());
         User user1 = User.builder()
                 .id(1)
                 .email("email@yandex.ru")
