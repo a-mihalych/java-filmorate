@@ -31,14 +31,14 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handlerFilmorateException(final FilmorateException e) {
-        log.warn("!!! ErrorHandler: {}", e.getMessage());
+        log.warn("!!! ErrorHandler: {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handlerException(final Exception e) {
-        log.warn("!!! ErrorHandler: {}", e.getMessage());
+        log.warn("!!! ErrorHandler: {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 }

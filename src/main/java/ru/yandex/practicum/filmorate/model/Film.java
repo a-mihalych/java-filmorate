@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.validation.BeginOfCinemaEra;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 
 @Setter
 @Getter
@@ -29,4 +30,6 @@ public class Film {
     @NotNull
     @Positive
     private Integer duration;
+    private Mpa mpa;
+    private LinkedHashSet<Genre> genres;
 }

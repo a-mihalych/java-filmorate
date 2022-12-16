@@ -18,12 +18,13 @@ public class UserService {
     private final ValidationService validationService;
 
     public User createUser(User user) {
-        user = validationService.validationUser("Создание ", user);
+        user = validationService.validationUser(user);
         return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {
-        user = validationService.validationUser("Обновление ", user);
+        user = validationService.validationUser(user);
+        validationService.validationNotFoundIdUser(user.getId());
         return userStorage.saveUser(user);
     }
 
@@ -32,7 +33,7 @@ public class UserService {
     }
 
     public User getUser(int id) {
-        id = validationService.validationPositive(id, "id");
+        id = validationService.validationPositive(id);
         User user = userStorage.getUser(id);
         if (user == null) {
             log.warn("!! Не найден пользователь id={}", id);
@@ -42,12 +43,9 @@ public class UserService {
     }
 
     public Collection<User> getFriendsForIdUser(int id) {
-        id = validationService.validationPositive(id, "id");
+        id = validationService.validationPositive(id);
+        validationService.validationNotFoundIdUser(id);
         Collection<Integer> idFriends = userStorage.getIdFriendsForIdUser(id);
-        if (idFriends == null) {
-            log.warn("!! Не найден пользователь id={}", id);
-            throw new NotFoundException("");
-        }
         List<User> friends = new ArrayList<>();
         for (Integer idFriend : idFriends) {
             friends.add(userStorage.getUser(idFriend));
@@ -56,8 +54,10 @@ public class UserService {
     }
 
     public Collection<User> mutualFriends(int id, int otherId) {
-        id = validationService.validationPositive(id, "id");
-        otherId = validationService.validationPositive(otherId, "otherId");
+        id = validationService.validationPositive(id);
+        otherId = validationService.validationPositive(otherId);
+        validationService.validationNotFoundIdUser(id);
+        validationService.validationNotFoundIdUser(otherId);
         Set<User> friendsMutual = new HashSet<>(getFriendsForIdUser(id));
         friendsMutual.addAll(getFriendsForIdUser(otherId));
         friendsMutual.remove(getUser(id));
@@ -66,22 +66,18 @@ public class UserService {
     }
 
     public void addFriend(int id, int friendId) {
-        id = validationService.validationPositive(id, "id");
-        friendId = validationService.validationPositive(friendId, "friendId");
-        if ((userStorage.getUser(id) == null) || (userStorage.getUser(friendId) == null)) {
-            log.warn("!! Не найден пользователь для добовления в друзья");
-            throw new NotFoundException("");
-        }
+        id = validationService.validationPositive(id);
+        friendId = validationService.validationPositive(friendId);
+        validationService.validationNotFoundIdUser(id);
+        validationService.validationNotFoundIdUser(friendId);
         userStorage.addFriend(id, friendId);
     }
 
     public void deleteFriend(int id, int friendId) {
-        id = validationService.validationPositive(id, "id");
-        friendId = validationService.validationPositive(friendId, "friendId");
-        if ((userStorage.getUser(id) == null) || (userStorage.getUser(friendId) == null)) {
-            log.warn("!!! Не найден пользователь для удаления из друзей");
-            throw new NotFoundException("");
-        }
+        id = validationService.validationPositive(id);
+        friendId = validationService.validationPositive(friendId);
+        validationService.validationNotFoundIdUser(id);
+        validationService.validationNotFoundIdUser(friendId);
         userStorage.deleteFriend(id, friendId);
     }
 }
