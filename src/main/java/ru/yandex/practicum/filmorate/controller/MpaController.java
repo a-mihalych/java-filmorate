@@ -24,9 +24,10 @@ public class MpaController {
         log.info("! Запрос на получение списка рейтинга MPA.");
         return mpaService.getMpa();
     }
+
     @GetMapping("/{id}")
     public Mpa getMpaForId(@PathVariable int id) {
-        log.info("! Запрос на получение рейтинга MPA для фильма с id={}.", id);
+        log.info("! Запрос на получение рейтинга MPA с id={}.", id);
         return mpaService.getMpaForId(id);
     }
 }

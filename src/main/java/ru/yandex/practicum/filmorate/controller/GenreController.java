@@ -27,7 +27,7 @@ public class GenreController {
 
     @GetMapping("/{id}")
     public Genre getGenreForId(@PathVariable int id) {
-        log.info("! Запрос на получение списка жанров для фильма с id={}.", id);
+        log.info("! Запрос на получение жанра с id={}.", id);
         return getGenre.getGenreForId(id);
     }
 }

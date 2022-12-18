@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +22,7 @@ public class FilmDbStorageTests {
 
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
+    private final LikeDbStorage likeStorage;
 
     @Test
     public void  getFilmsTest() {
@@ -120,114 +120,6 @@ public class FilmDbStorageTests {
     }
 
     @Test
-    public void addLikeTest() {
-        User user1 = User.builder()
-                .email("email1@yandex.ru")
-                .login("Login1")
-                .name("Name1")
-                .birthday(LocalDate.of(2000, 2, 22))
-                .build();
-        user1 = userStorage.createUser(user1);
-        int id1User = user1.getId();
-        User user2 = User.builder()
-                .email("email2@yandex.ru")
-                .login("Login2")
-                .name("Name2")
-                .birthday(LocalDate.of(2000, 2, 22))
-                .build();
-        user2 = userStorage.createUser(user2);
-        int id2User = user2.getId();
-        Film film1 = Film.builder()
-                .name("Кино")
-                .description("Интересное кино, наверное.")
-                .releaseDate(LocalDate.of(1999, 9, 9))
-                .duration(99)
-                .mpa(new Mpa(1, "G"))
-                .genres(new LinkedHashSet<Genre>())
-                .build();
-        film1 = filmStorage.createFilm(film1);
-        int id1 = film1.getId();
-        Film film2 = Film.builder()
-                .name("Кино2")
-                .description("Другое кино, наверное.")
-                .releaseDate(LocalDate.of(1999, 9, 9))
-                .duration(99)
-                .mpa(new Mpa(1, "G"))
-                .genres(new LinkedHashSet<Genre>())
-                .build();
-        film2 = filmStorage.createFilm(film2);
-        int id2 = film2.getId();
-        filmStorage.addLike(id1, id1User);
-        assertEquals(id1, ((ArrayList<Film>) filmStorage.getFilmsLikes(10)).get(0).getId(),
-                     "Индефикатор не совпадает");
-        filmStorage.addLike(id2, id1User);
-        filmStorage.addLike(id2, id2User);
-        assertEquals(id2, ((ArrayList<Film>) filmStorage.getFilmsLikes(10)).get(0).getId(),
-                     "Индефикатор не совпадает");
-        filmStorage.deleteLike(id1, id1User);
-        filmStorage.deleteLike(id2, id1User);
-        filmStorage.deleteLike(id2, id2User);
-        filmStorage.deleteFilm(id1);
-        filmStorage.deleteFilm(id2);
-        userStorage.deleteUser(id1User);
-        userStorage.deleteUser(id2User);
-    }
-
-    @Test
-    public void deleteLikeTest() {
-        User user1 = User.builder()
-                .email("email1@yandex.ru")
-                .login("Login1")
-                .name("Name1")
-                .birthday(LocalDate.of(2000, 2, 22))
-                .build();
-        user1 = userStorage.createUser(user1);
-        int id1User = user1.getId();
-        User user2 = User.builder()
-                .email("email2@yandex.ru")
-                .login("Login2")
-                .name("Name2")
-                .birthday(LocalDate.of(2000, 2, 22))
-                .build();
-        user2 = userStorage.createUser(user2);
-        int id2User = user2.getId();
-        Film film1 = Film.builder()
-                .name("Кино")
-                .description("Интересное кино, наверное.")
-                .releaseDate(LocalDate.of(1999, 9, 9))
-                .duration(99)
-                .mpa(new Mpa(1, "G"))
-                .genres(new LinkedHashSet<Genre>())
-                .build();
-        film1 = filmStorage.createFilm(film1);
-        int id1 = film1.getId();
-        Film film2 = Film.builder()
-                .name("Кино2")
-                .description("Другое кино, наверное.")
-                .releaseDate(LocalDate.of(1999, 9, 9))
-                .duration(99)
-                .mpa(new Mpa(1, "G"))
-                .genres(new LinkedHashSet<Genre>())
-                .build();
-        film2 = filmStorage.createFilm(film2);
-        int id2 = film2.getId();
-        filmStorage.addLike(id1, id1User);
-        filmStorage.addLike(id1, id2User);
-        filmStorage.addLike(id2, id1User);
-        assertEquals(id1, ((ArrayList<Film>) filmStorage.getFilmsLikes(10)).get(0).getId(),
-                     "Индефикатор не совпадает");
-        filmStorage.deleteLike(id1, id1User);
-        filmStorage.deleteLike(id1, id2User);
-        assertEquals(id2, ((ArrayList<Film>) filmStorage.getFilmsLikes(10)).get(0).getId(),
-                     "Индефикатор не совпадает");
-        filmStorage.deleteLike(id2, id1User);
-        filmStorage.deleteFilm(id1);
-        filmStorage.deleteFilm(id2);
-        userStorage.deleteUser(id1User);
-        userStorage.deleteUser(id2User);
-    }
-
-    @Test
     public void getFilmsLikesTest() {
         User user = User.builder()
                 .email("email@yandex.ru")
@@ -247,10 +139,10 @@ public class FilmDbStorageTests {
                 .build();
         film = filmStorage.createFilm(film);
         int id = film.getId();
-        filmStorage.addLike(id, idUser);
+        likeStorage.addLike(id, idUser);
         assertEquals(1, filmStorage.getFilmsLikes(10).size(),
                      "Количество фильмов в списке не совпадает");
-        filmStorage.deleteLike(id, idUser);
+        likeStorage.deleteLike(id, idUser);
         filmStorage.deleteFilm(id);
         userStorage.deleteUser(idUser);
     }

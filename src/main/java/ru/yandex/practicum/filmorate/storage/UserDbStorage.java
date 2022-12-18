@@ -4,14 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Repository
@@ -26,30 +27,14 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sql, this::makeUser);
     }
 
-    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
-        return User.builder()
-                .id(rs.getInt("USER_ID"))
-                .email(rs.getString("EMAIL"))
-                .login(rs.getString("LOGIN"))
-                .name(rs.getString("USER_NAME"))
-                .birthday(rs.getDate("BIRTHDAY").toLocalDate())
-                .build();
-    }
-
     @Override
     public User getUser(int id) {
         String sql = "SELECT * FROM USERS WHERE USER_ID = ?";
-        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, id);
-        if (sqlRowSet.next()) {
-            return User.builder()
-                    .id(sqlRowSet.getInt("USER_ID"))
-                    .email(sqlRowSet.getString("EMAIL"))
-                    .login(sqlRowSet.getString("LOGIN"))
-                    .name(sqlRowSet.getString("USER_NAME"))
-                    .birthday(sqlRowSet.getDate("BIRTHDAY").toLocalDate())
-                    .build();
+        List<User> users = jdbcTemplate.query(sql, this::makeUser, id);
+        if (users.size() != 1) {
+            throw new NotFoundException("Не найден пользователь");
         }
-        return null;
+        return users.get(0);
     }
 
     @Override
@@ -96,25 +81,21 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(int user, int friend) {
-        String sql = "INSERT INTO FRIENDS(USER_ID, FRIEND_ID) " +
-                     "VALUES (?, ?)";
-        jdbcTemplate.update(sql, user, friend);
+    public Collection<User> getFriendsForIdUser(int id) {
+        String sql = "SELECT U.USER_ID, U.EMAIL, U.LOGIN, U.USER_NAME, U.BIRTHDAY " +
+                     "FROM FRIENDS AS F " +
+                     "INNER JOIN USERS AS U ON F.FRIEND_ID = U.USER_ID " +
+                     "WHERE F.USER_ID = ?";
+        return jdbcTemplate.query(sql, this::makeUser, id);
     }
 
-    @Override
-    public void deleteFriend(int user, int friend) {
-        String sql = "DELETE FROM FRIENDS WHERE (USER_ID = ? AND FRIEND_ID = ?)";
-        jdbcTemplate.update(sql, user, friend);
-    }
-
-    @Override
-    public Collection<Integer> getIdFriendsForIdUser(int id) {
-        String sql = "SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeIdFriend(rs), id);
-    }
-
-    private Integer makeIdFriend(ResultSet rs) throws SQLException {
-        return rs.getInt("FRIEND_ID");
+    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
+        return User.builder()
+                .id(rs.getInt("USER_ID"))
+                .email(rs.getString("EMAIL"))
+                .login(rs.getString("LOGIN"))
+                .name(rs.getString("USER_NAME"))
+                .birthday(rs.getDate("BIRTHDAY").toLocalDate())
+                .build();
     }
 }
