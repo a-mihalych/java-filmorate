@@ -1,78 +1,74 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.exception.FilmorateException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 @Slf4j
 @Getter
+@Setter
 @Service
-@RequiredArgsConstructor
 public class ValidationService {
 
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
+    private final MpaStorage mpaStorage;
+    private final GenreStorage genreStorage;
 
-    public User validationUser(String method, User user) {
-        String error = "";
-        for (User userCollection : userStorage.getUsers()) {
-            if (!userCollection.getId().equals(user.getId()) && userCollection.getLogin().equals(user.getLogin())) {
-                if (method.equals("Создание ")) {
-                    error += (method + "пользователя прервано! Логин занят.");
-                } else {
-                    error += (method + "пользователя прервано! Неверный id.");
-                    log.warn("!!! ValidationService: {}", error);
-                    throw new FilmorateException(error);
-                }
-                break;
-            }
-        }
+    public ValidationService(UserStorage userStorage, FilmStorage filmStorage,
+                             MpaStorage mpaStorage, GenreStorage genreStorage) {
+        this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
+        this.mpaStorage = mpaStorage;
+        this.genreStorage = genreStorage;
+    }
+
+    public User validationUser(User user) {
         if ((user.getName() == null) || (user.getName().isBlank())) {
             user.setName(user.getLogin());
-            log.info("!!! ValidationService: Не задано имя для отображения, для отображения будет использован логин");
-        }
-        if (!error.isBlank()) {
-            log.warn("!!! ValidationService: {}", error);
-            throw new ValidationException(error);
+            log.info("!! ValidationService: Не задано имя для отображения, для отображения будет использован логин");
         }
         return user;
     }
 
-    public Film validationFilm(String method, Film film) {
-        String error = "";
-        for (Film filmCollection : filmStorage.getFilms()) {
-            if (!filmCollection.getId().equals(film.getId()) && filmCollection.getName().equals(film.getName())) {
-                if (method.equals("Создание ")) {
-                    error += (method + "фильма прервано! Название уже существует.");
-                } else {
-                    error += (method + "фильма прервано! Неверный id.");
-                    log.warn("!!! ValidationService: {}", error);
-                    throw new FilmorateException(error);
-                }
-                break;
-            }
-        }
-        if (!error.isBlank()) {
-            log.warn("!!! ValidationService: {}", error);
-            throw new ValidationException(error);
-        }
-        return film;
-    }
-
-    public int validationPositive(int id, String name) {
-        if (id < 1) {
-            String error = "Ошибка, аргумент " + name + " должен быть больше 0.";
-            log.warn("!!! ValidationService: {}", error);
-            throw new NotFoundException(error);
+    public int validationNotFoundIdFilm(int id) {
+        if (filmStorage.getFilm(id) == null) {
+            throw new NotFoundException(String.format("Фильм с id = %s в базе отсутствует", id));
         }
         return id;
+    }
+
+    public int validationNotFoundIdUser(int id) {
+        if (userStorage.getUser(id) == null) {
+            throw new NotFoundException(String.format("Пользователь с id = %s в базе отсутствует", id));
+        }
+        return id;
+    }
+
+    public int validationNotFoundIdMpa(int id) {
+        if (mpaStorage.getMpaForId(id) == null) {
+            throw new NotFoundException(String.format("Рейтинг с id = %s в базе отсутствует", id));
+        }
+        return id;
+    }
+
+    public int validationNotFoundIdGenre(int id) {
+        if (genreStorage.getGenreForId(id) == null) {
+            throw new NotFoundException(String.format("Жанр с id = %s в базе отсутствует", id));
+        }
+        return id;
+    }
+
+    public int validationPositive(int arg) {
+        if (arg < 1) {
+            throw new NotFoundException("Ошибка, аргумент должен быть больше 0");
+        }
+        return arg;
     }
 }
